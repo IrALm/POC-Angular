@@ -1,0 +1,314 @@
+<div class="p-6 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <a routerLink="/proprietaire/biens" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-4 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Retour à mes biens
+    </a>
+    <h1 class="text-2xl font-bold text-gray-900">Publier un bien</h1>
+    <p class="text-sm text-gray-500 mt-1">Remplissez les informations pour mettre votre bien en location.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
+    <!-- Error global -->
+    @if (error()) {
+      <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-3">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Section 1 : Type -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Type de bien</h2>
+      <div class="grid grid-cols-3 gap-3">
+        @for (opt of typeOptions; track opt.value) {
+          <button type="button" (click)="setType(opt.value)"
+            [class]="selectedType === opt.value
+              ? 'border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+              : 'border border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl transition">
+            <span class="text-2xl">{{ opt.icon }}</span>
+            <span class="text-sm font-medium">{{ opt.label }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Section 2 : Informations générales -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Informations générales</h2>
+      <div class="space-y-4">
+        <!-- Titre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Titre de l'annonce <span class="text-red-500">*</span></label>
+          <input formControlName="titre" type="text" placeholder="Bel appartement lumineux au cœur de Lyon..."
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-400]="fieldError('titre')">
+          @if (fieldError('titre'); as err) {
+            <p class="text-xs text-red-500 mt-1">{{ err }}</p>
+          }
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-red-500">*</span></label>
+          <textarea formControlName="description" rows="5"
+            placeholder="Décrivez votre bien, l'environnement, les équipements disponibles..."
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            [class.border-red-400]="fieldError('description')"></textarea>
+          @if (fieldError('description'); as err) {
+            <p class="text-xs text-red-500 mt-1">{{ err }}</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3 : Adresse -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Localisation</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Adresse <span class="text-red-500">*</span></label>
+          <input formControlName="adresse" type="text" placeholder="12 rue de la Paix"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('adresse')">
+          @if (fieldError('adresse'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ville <span class="text-red-500">*</span></label>
+          <input formControlName="ville" type="text" placeholder="Lyon"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('ville')">
+          @if (fieldError('ville'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Code postal <span class="text-red-500">*</span></label>
+          <input formControlName="codePostal" type="text" placeholder="69000"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('codePostal')">
+          @if (fieldError('codePostal'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pays <span class="text-red-500">*</span></label>
+          <input formControlName="pays" type="text" placeholder="France"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('pays')">
+          @if (fieldError('pays'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4 : Caractéristiques -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Caractéristiques</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Surface (m²) <span class="text-red-500">*</span></label>
+          <input formControlName="surfaceHabitable" type="number" min="5" placeholder="50"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('surfaceHabitable')">
+          @if (fieldError('surfaceHabitable'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nb pièces <span class="text-red-500">*</span></label>
+          <input formControlName="nombrePieces" type="number" min="1" placeholder="3"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('nombrePieces')">
+          @if (fieldError('nombrePieces'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nb chambres <span class="text-red-500">*</span></label>
+          <input formControlName="nombreChambres" type="number" min="0" placeholder="2"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('nombreChambres')">
+          @if (fieldError('nombreChambres'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Étage</label>
+          <input formControlName="etage" type="number" min="0" placeholder="2"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <p class="text-xs text-gray-400 mt-1">0 = rez-de-chaussée</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Année de construction</label>
+          <input formControlName="anneeConstruction" type="number" min="1800" max="2030" placeholder="1990"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Disponible dès</label>
+          <input formControlName="disponibleDe" type="date"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <!-- Toggles -->
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button type="button" (click)="toggleAscenseur()"
+          [class]="form.get('ascenseur')?.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'"
+          class="px-4 py-2 rounded-xl border text-sm font-medium transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+          Ascenseur
+        </button>
+        <button type="button" (click)="toggleMeuble()"
+          [class]="form.get('meuble')?.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'"
+          class="px-4 py-2 rounded-xl border text-sm font-medium transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          Meublé
+        </button>
+        <button type="button" (click)="toggleColocation()"
+          [class]="form.get('colocation')?.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'"
+          class="px-4 py-2 rounded-xl border text-sm font-medium transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Colocation
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 5 : Chauffage -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Mode de chauffage <span class="text-red-500">*</span></h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        @for (opt of chauffageOptions; track opt.value) {
+          <label [class]="form.get('modeChauffage')?.value === opt.value
+              ? 'border-2 border-blue-600 bg-blue-50 text-blue-700'
+              : 'border border-gray-200 text-gray-700 hover:border-gray-300'"
+            class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition">
+            <input type="radio" formControlName="modeChauffage" [value]="opt.value" class="sr-only">
+            <span class="text-sm font-medium">{{ opt.label }}</span>
+          </label>
+        }
+      </div>
+    </section>
+
+    <!-- Section 6 : Diagnostics -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Diagnostics énergétiques</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">Classe énergie (DPE) <span class="text-red-500">*</span></label>
+          <div class="flex gap-2 flex-wrap">
+            @for (c of energyOptions; track c) {
+              <button type="button" (click)="setEnergie(c)"
+                [class]="selectedEnergie === c ? energyColors[c] + ' ring-2 ring-offset-1 ring-gray-400' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+                class="w-10 h-10 rounded-xl text-sm font-bold transition">{{ c }}</button>
+            }
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">Classe GES <span class="text-red-500">*</span></label>
+          <div class="flex gap-2 flex-wrap">
+            @for (c of energyOptions; track c) {
+              <button type="button" (click)="setGes(c)"
+                [class]="selectedGes === c ? energyColors[c] + ' ring-2 ring-offset-1 ring-gray-400' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+                class="w-10 h-10 rounded-xl text-sm font-bold transition">{{ c }}</button>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7 : Prix -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Informations financières</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Loyer mensuel (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="loyerMensuel" type="number" min="1" placeholder="850"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('loyerMensuel')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('loyerMensuel'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Charges mensuelles (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="chargesMensuelles" type="number" min="0" placeholder="100"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('chargesMensuelles')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('chargesMensuelles'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt de garantie (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="depotGarantie" type="number" min="0" placeholder="1700"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('depotGarantie')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('depotGarantie'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8 : Photos -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Photos</h2>
+
+      <!-- Upload zone -->
+      <label
+        class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition">
+        <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <p class="text-sm text-gray-500">Cliquez pour ajouter des photos</p>
+        <p class="text-xs text-gray-400 mt-1">JPG, PNG, WebP — plusieurs fichiers acceptés</p>
+        <input type="file" accept="image/*" multiple class="hidden" (change)="onImagesChange($event)">
+      </label>
+
+      <!-- Previews grid -->
+      @if (imagePreviews().length > 0) {
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          @for (preview of imagePreviews(); track $index) {
+            <div class="relative group rounded-xl overflow-hidden aspect-square bg-gray-100">
+              <img [src]="preview" class="w-full h-full object-cover">
+              <button type="button" (click)="removeImage($index)"
+                class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-xs font-bold shadow">
+                ×
+              </button>
+              @if ($index === 0) {
+                <span class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded font-medium">Photo principale</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row gap-3 pt-2 pb-8">
+      <button type="submit" [disabled]="loading()"
+        class="flex-1 sm:flex-none sm:min-w-[160px] py-3 px-6 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition flex items-center justify-center gap-2">
+        @if (loading()) {
+          <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          Publication...
+        } @else {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
+          Publier l'annonce
+        }
+      </button>
+      <a routerLink="/proprietaire/biens"
+        class="flex-1 sm:flex-none sm:min-w-[120px] py-3 px-6 bg-white text-gray-700 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition text-center">
+        Annuler
+      </a>
+    </div>
+  </form>
+</div>

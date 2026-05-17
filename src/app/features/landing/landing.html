@@ -1,0 +1,247 @@
+<!-- ══ HERO ══════════════════════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
+  <!-- Background decorative elements -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+    <div class="max-w-3xl mx-auto text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        <span class="text-sm font-medium text-blue-100">Plateforme 100% gratuite</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-6">
+        Simplifiez votre
+        <span class="bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text text-transparent">gestion immobilière</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Kupanga centralise la gestion de vos biens, contrats, états des lieux et quittances.
+        Propriétaires et locataires, tout est réuni dans un seul espace sécurisé.
+      </p>
+
+      <!-- CTA buttons -->
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a routerLink="/login"
+           class="inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+          Accéder à mon espace
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="mt-16 sm:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto">
+      @for (stat of stats; track stat.label) {
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">{{ stat.value }}</p>
+          <p class="text-sm text-blue-200 mt-1 font-medium">{{ stat.label }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════════════════════ -->
+<section class="py-20 sm:py-24 bg-white" id="features">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-sm font-bold text-blue-600 uppercase tracking-widest">Fonctionnalités</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4">
+        Tout ce dont vous avez besoin
+      </h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">
+        Une plateforme complète pour simplifier chaque étape de votre gestion locative.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (feature of features; track feature.title) {
+        <div class="group relative p-7 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg bg-white transition-all duration-300">
+          <!-- Icon -->
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-2xl mb-5 transition-colors">
+            {{ feature.icon }}
+          </div>
+          <h3 class="font-bold text-gray-900 text-lg mb-2">{{ feature.title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ feature.desc }}</p>
+          <!-- Subtle hover accent -->
+          <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════════════════════ -->
+<section class="py-20 sm:py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-sm font-bold text-blue-600 uppercase tracking-widest">Mode d'emploi</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4">Comment ça marche ?</h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">
+        Trois étapes suffisent pour commencer à gérer votre immobilier efficacement.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+      <!-- Connecting line (desktop) -->
+      <div class="hidden md:block absolute top-14 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200"></div>
+
+      @for (step of [{n:'1', icon:'👤', t:'Créez votre compte', d:'Inscrivez-vous gratuitement en tant que propriétaire ou locataire. C\'est rapide et sans engagement.'},
+                     {n:'2', icon:'🏠', t:'Publiez ou trouvez', d:'Propriétaires : publiez vos annonces avec photos. Locataires : trouvez votre logement idéal en quelques filtres.'},
+                     {n:'3', icon:'📋', t:'Gérez simplement', d:'Centralisez contrats, quittances, états des lieux et échangez avec vos interlocuteurs en temps réel.'}];
+           track step.n) {
+        <div class="flex flex-col items-center text-center relative">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-3xl font-extrabold mb-6 shadow-lg relative z-10 ring-4 ring-white">
+            {{ step.icon }}
+          </div>
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold mb-3">
+            {{ step.n }}
+          </div>
+          <h3 class="font-bold text-gray-900 text-lg mb-2">{{ step.t }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed max-w-xs">{{ step.d }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOR WHO ════════════════════════════════════════════════════════════════ -->
+<section class="py-20 sm:py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-sm font-bold text-blue-600 uppercase tracking-widest">Pour qui ?</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4">
+        Que vous soyez propriétaire ou locataire
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <!-- Propriétaire -->
+      <div class="relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-100 overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100/50 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="relative">
+          <div class="w-14 h-14 bg-blue-700 rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🏠</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Propriétaire</h3>
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Publiez vos annonces avec photos et localisation
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Générez contrats et quittances en un clic
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Réalisez vos états des lieux numériquement
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Communiquez avec vos locataires en temps réel
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Locataire -->
+      <div class="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 border border-emerald-100 overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100/50 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="relative">
+          <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-5 shadow-md">🔑</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Locataire</h3>
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Recherchez et filtrez les annonces par critères
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Contactez directement les propriétaires
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Signez vos contrats et états des lieux en ligne
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Retrouvez vos quittances et documents à tout moment
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══════════════════════════════════════════════════════════ -->
+<section class="py-20 sm:py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-sm font-bold text-blue-600 uppercase tracking-widest">Témoignages</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4">
+        Ils utilisent Kupanga
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      @for (t of testimonials; track t.name) {
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              {{ t.initials }}
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900 text-sm">{{ t.name }}</p>
+              <p class="text-xs text-gray-500">{{ t.role }}</p>
+            </div>
+          </div>
+          <p class="text-gray-600 text-sm leading-relaxed italic">"{{ t.quote }}"</p>
+          <div class="mt-4 flex gap-0.5">
+            @for (_ of [1,2,3,4,5]; track $index) {
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ═════════════════════════════════════════════════════════════ -->
+<section class="py-20 sm:py-24 bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white relative overflow-hidden">
+  <!-- Background glow -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-3xl sm:text-4xl font-extrabold mb-5">
+      Prêt à simplifier votre gestion ?
+    </h2>
+    <p class="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
+      Rejoignez Kupanga et gérez votre immobilier plus efficacement dès aujourd'hui. Inscription gratuite en moins de 2 minutes.
+    </p>
+
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a routerLink="/login"
+         class="inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+        Accéder à mon espace
+      </a>
+    </div>
+
+    <p class="text-blue-200/60 text-xs mt-8">Aucune carte bancaire requise • Annulez à tout moment</p>
+  </div>
+</section>

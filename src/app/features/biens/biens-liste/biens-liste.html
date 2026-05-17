@@ -1,0 +1,293 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Biens disponibles</h1>
+          @if (page(); as p) {
+            <p class="text-sm text-gray-500 mt-1">{{ p.totalElements }} bien{{ p.totalElements > 1 ? 's' : '' }} trouvé{{ p.totalElements > 1 ? 's' : '' }}</p>
+          }
+        </div>
+        <button (click)="toggleFilters()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+          </svg>
+          Filtres
+          @if (showFilters()) {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+            </svg>
+          } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          }
+        </button>
+      </div>
+
+      <!-- Filters panel -->
+      @if (showFilters()) {
+        <form [formGroup]="filterForm" (ngSubmit)="search(0)" class="mt-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Titre -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Titre / mots-clés</label>
+              <input formControlName="titre" type="text" placeholder="Appartement lumineux..."
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Ville -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Ville</label>
+              <input formControlName="ville" type="text" placeholder="Paris, Lyon..."
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Loyer max -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Loyer max (€/mois)</label>
+              <input formControlName="loyerMax" type="number" min="0" placeholder="1500"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Surface min -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Surface min (m²)</label>
+              <input formControlName="surfaceMin" type="number" min="0" placeholder="20"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Pièces min -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Nb pièces min</label>
+              <input formControlName="piecesMin" type="number" min="1" placeholder="2"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Sort -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Trier par</label>
+              <div class="flex gap-2">
+                <select formControlName="sortBy"
+                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="createdAt">Date</option>
+                  <option value="loyerMensuel">Loyer</option>
+                  <option value="surfaceHabitable">Surface</option>
+                </select>
+                <select formControlName="sortDirection"
+                  class="w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="DESC">↓</option>
+                  <option value="ASC">↑</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Type chips -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="text-xs font-medium text-gray-600 self-center">Type :</span>
+            <button type="button" (click)="toggleType('typeAPPARTEMENT')"
+              [class]="filterForm.get('typeAPPARTEMENT')?.value ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'"
+              class="px-3 py-1.5 rounded-full text-xs font-medium transition">🏢 Appartement</button>
+            <button type="button" (click)="toggleType('typeMAISON')"
+              [class]="filterForm.get('typeMAISON')?.value ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'"
+              class="px-3 py-1.5 rounded-full text-xs font-medium transition">🏡 Maison</button>
+            <button type="button" (click)="toggleType('typeSTUDIO')"
+              [class]="filterForm.get('typeSTUDIO')?.value ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'"
+              class="px-3 py-1.5 rounded-full text-xs font-medium transition">🛋️ Studio</button>
+            <span class="text-xs font-medium text-gray-600 self-center ml-3">Options :</span>
+            <button type="button" (click)="toggleBoolean('meuble')"
+              [class]="filterForm.get('meuble')?.value === true ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'"
+              class="px-3 py-1.5 rounded-full text-xs font-medium transition">Meublé</button>
+            <button type="button" (click)="toggleBoolean('colocation')"
+              [class]="filterForm.get('colocation')?.value === true ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'"
+              class="px-3 py-1.5 rounded-full text-xs font-medium transition">Colocation</button>
+          </div>
+
+          <div class="mt-4 flex gap-3">
+            <button type="submit"
+              class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+              Rechercher
+            </button>
+            <button type="button" (click)="resetFilters()"
+              class="px-5 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              Réinitialiser
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+            <div class="h-48 bg-gray-200"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div class="h-6 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty -->
+    @if (!loading() && biens().length === 0) {
+      <div class="text-center py-20">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun bien trouvé</h3>
+        <p class="text-gray-500">Essayez d'élargir vos critères de recherche.</p>
+        <button (click)="resetFilters()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+          Voir tous les biens
+        </button>
+      </div>
+    }
+
+    <!-- Grid -->
+    @if (!loading() && biens().length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (bien of biens(); track bien.id) {
+          <a [routerLink]="['/biens', bien.id]"
+            class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 border border-gray-100 flex flex-col">
+
+            <!-- Image -->
+            <div class="relative h-48 bg-gray-100 overflow-hidden">
+              @if (firstImage(bien); as img) {
+                <img [src]="img" [alt]="bien.titre"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              } @else {
+                <div class="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-gray-100 to-gray-200">
+                  {{ bien.typeBien === 'MAISON' ? '🏡' : bien.typeBien === 'STUDIO' ? '🛋️' : '🏢' }}
+                </div>
+              }
+              <!-- Type badge -->
+              <span class="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 shadow-sm">
+                {{ typeLabels[bien.typeBien] }}
+              </span>
+              <!-- Energy badge -->
+              <span [class]="energyClass(bien.classeEnergie)"
+                class="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
+                {{ bien.classeEnergie }}
+              </span>
+              <!-- Meublé / Coloc tags -->
+              @if (bien.meuble || bien.colocation) {
+                <div class="absolute bottom-3 left-3 flex gap-1.5">
+                  @if (bien.meuble) {
+                    <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-xs font-medium rounded-full">Meublé</span>
+                  }
+                  @if (bien.colocation) {
+                    <span class="px-2 py-0.5 bg-purple-500 text-white text-xs font-medium rounded-full">Coloc</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Content -->
+            <div class="p-4 flex flex-col flex-1">
+              <h3 class="font-semibold text-gray-900 text-base leading-snug line-clamp-2 group-hover:text-blue-700 transition">
+                {{ bien.titre }}
+              </h3>
+              <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {{ bien.ville }}{{ bien.codePostal ? ' (' + bien.codePostal + ')' : '' }}
+              </p>
+
+              <!-- Stats row -->
+              <div class="mt-3 flex items-center gap-3 text-xs text-gray-500">
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                  </svg>
+                  {{ bien.surfaceHabitable }} m²
+                </span>
+                <span class="text-gray-300">•</span>
+                <span>{{ bien.nombrePieces }} pièce{{ bien.nombrePieces > 1 ? 's' : '' }}</span>
+                <span class="text-gray-300">•</span>
+                <span>{{ bien.nombreChambres }} ch.</span>
+              </div>
+
+              <div class="mt-auto pt-4">
+                <!-- Price -->
+                <div class="flex items-end justify-between">
+                  <div>
+                    <span class="text-xl font-bold text-blue-700">{{ formatPrice(bien.loyerMensuel) }} €</span>
+                    <span class="text-xs text-gray-500">/mois</span>
+                    @if (bien.chargesMensuelles) {
+                      <span class="text-xs text-gray-400 ml-1">+ {{ formatPrice(bien.chargesMensuelles) }} € charges</span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Proprietaire row + contact -->
+                <div class="mt-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    @if (bien.proprietaire?.urlProfile) {
+                      <img [src]="bien.proprietaire!.urlProfile!" [alt]="bien.proprietaire!.firstName"
+                        class="w-7 h-7 rounded-full object-cover border border-gray-200">
+                    } @else {
+                      <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-700">
+                        {{ proprietaireInitials(bien) }}
+                      </div>
+                    }
+                    <span class="text-xs text-gray-600 font-medium">
+                      {{ bien.proprietaire?.firstName }} {{ bien.proprietaire?.lastName }}
+                    </span>
+                  </div>
+
+                  @if (!isOwnBien(bien)) {
+                    <button (click)="contacter($event, bien)"
+                      class="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                      </svg>
+                      Contacter
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (page(); as p) {
+        @if (p.totalPages > 1) {
+          <div class="mt-10 flex items-center justify-center gap-1">
+            <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
+              class="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+
+            @for (pg of pagesArray(); track pg) {
+              @if (pg === -1) {
+                <span class="px-2 py-2 text-gray-400 text-sm">…</span>
+              } @else {
+                <button (click)="goToPage(pg)"
+                  [class]="pg === currentPage() ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                  class="min-w-[2.25rem] h-9 px-3 rounded-lg border text-sm font-medium transition">
+                  {{ pg + 1 }}
+                </button>
+              }
+            }
+
+            <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= p.totalPages - 1"
+              class="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        }
+      }
+    }
+  </div>
+</div>
