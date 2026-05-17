@@ -1,0 +1,131 @@
+<div class="min-h-screen flex flex-col bg-gray-50">
+
+  <!-- ─── Navbar ─── -->
+  <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a routerLink="/" class="flex items-center gap-2.5 shrink-0" (click)="closeMenu()">
+          <div class="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center shadow-sm">
+            <span class="text-white font-bold text-sm">K</span>
+          </div>
+          <span class="text-xl font-bold text-gray-900 tracking-tight">Kupanga</span>
+        </a>
+
+        <!-- Desktop nav links -->
+        <div class="hidden md:flex items-center gap-8">
+          <a routerLink="/" fragment="features"
+             class="text-gray-500 hover:text-blue-700 font-medium transition-colors text-sm">
+            Fonctionnalités
+          </a>
+          <a routerLink="/biens" routerLinkActive="text-blue-700 font-semibold"
+             class="text-gray-500 hover:text-blue-700 font-medium transition-colors text-sm">
+            Annonces
+          </a>
+        </div>
+
+        <!-- Desktop auth area -->
+        <div class="hidden md:flex items-center gap-3">
+          @if (auth.isLoggedIn()) {
+            <button (click)="goToDashboard()"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors">
+              @if (auth.currentUser()?.urlProfile) {
+                <img [src]="auth.currentUser()!.urlProfile!" alt="avatar"
+                     class="w-8 h-8 rounded-full object-cover border-2 border-blue-100">
+              } @else {
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span class="text-blue-700 font-semibold text-sm">
+                    {{ auth.currentUser()?.firstName?.charAt(0) }}
+                  </span>
+                </div>
+              }
+              Mon espace
+            </button>
+            <button (click)="logout()"
+                    class="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors">
+              Déconnexion
+            </button>
+          } @else {
+            <a routerLink="/login"
+               class="text-sm font-medium text-gray-600 hover:text-blue-700 transition-colors">
+              Connexion
+            </a>
+            <a routerLink="/register"
+               class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
+              Créer un compte
+            </a>
+          }
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button (click)="toggleMenu()"
+                class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+                aria-label="Menu">
+          @if (menuOpen()) {
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          } @else {
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          }
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    @if (menuOpen()) {
+      <div class="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-2">
+        <a routerLink="/biens" (click)="closeMenu()"
+           class="block px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          Annonces
+        </a>
+        <div class="border-t border-gray-100 pt-3 mt-3 space-y-2">
+          @if (auth.isLoggedIn()) {
+            <button (click)="goToDashboard(); closeMenu()"
+                    class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors">
+              Mon espace
+            </button>
+            <button (click)="logout()"
+                    class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+              Déconnexion
+            </button>
+          } @else {
+            <a routerLink="/login" (click)="closeMenu()"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              Connexion
+            </a>
+            <a routerLink="/register" (click)="closeMenu()"
+               class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 text-center transition-colors">
+              Créer un compte
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </nav>
+
+  <!-- ─── Page Content ─── -->
+  <main class="flex-1">
+    <router-outlet />
+  </main>
+
+  <!-- ─── Footer ─── -->
+  <footer class="bg-gray-900 text-gray-400 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
+            <span class="text-white font-bold text-xs">K</span>
+          </div>
+          <span class="text-white font-semibold">Kupanga</span>
+        </div>
+        <p class="text-sm">© 2026 Kupanga — Gestion immobilière simplifiée</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
