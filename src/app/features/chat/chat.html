@@ -1,0 +1,302 @@
+<!-- Incoming message toast -->
+@if (incomingNotif(); as n) {
+  <div class="fixed top-4 right-4 z-50 max-w-sm bg-white rounded-2xl shadow-lg border border-gray-200 p-4 flex items-start gap-3 animate-in slide-in-from-right">
+    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+      {{ initials(n.from) }}
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-xs font-semibold text-blue-600 truncate">{{ n.from }}</p>
+      <p class="text-sm text-gray-700 mt-0.5 truncate">{{ n.text }}</p>
+    </div>
+    <button (click)="incomingNotif.set(null)" class="text-gray-400 hover:text-gray-600 flex-shrink-0 text-lg leading-none">&times;</button>
+  </div>
+}
+
+<!-- Main layout — fills full parent height -->
+<div class="flex overflow-hidden h-full">
+
+  <!-- ══ SIDEBAR ═══════════════════════════════════════════════════════════ -->
+  <aside
+    class="flex flex-col w-full bg-white border-r border-gray-200 md:flex md:w-80 md:flex-shrink-0"
+    [class.hidden]="!showSidebar()"
+    [class.flex]="showSidebar()">
+
+    <!-- Header -->
+    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-2 flex-shrink-0">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+        <h1 class="text-sm font-semibold text-gray-900">Messagerie</h1>
+      </div>
+
+      <!-- Notif bell -->
+      <div class="relative">
+        <button (click)="showNotifPanel.update(v => !v)"
+          class="relative p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          @if (notifCount() > 0) {
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {{ notifCount() > 9 ? '9+' : notifCount() }}
+            </span>
+          }
+        </button>
+
+        <!-- Notification panel -->
+        @if (showNotifPanel()) {
+          <div class="absolute right-0 top-full mt-1 z-40 w-72 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+              <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Notifications</span>
+              <button (click)="clearNotifications()"
+                class="text-xs text-gray-400 hover:text-gray-700 underline">Effacer</button>
+            </div>
+            <div class="max-h-64 overflow-y-auto">
+              @if (notifications().length === 0) {
+                <p class="text-xs text-gray-400 text-center py-6">Aucune notification</p>
+              } @else {
+                @for (n of notifications(); track n.conversationId) {
+                  <button (click)="goToNotifConv(n.conversationId)"
+                    class="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition">
+                    <p class="text-xs font-semibold text-blue-600">{{ n.expediteurNom || n.expediteurEmail }}</p>
+                    <p class="text-sm text-gray-700 mt-0.5 truncate">{{ n.contenuPreview }}</p>
+                    <p class="text-[10px] text-gray-400 mt-1">{{ fmtTimeFull(n.createdAt) }}</p>
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Search + Filters -->
+    <div class="px-3 py-2.5 border-b border-gray-100 space-y-2 flex-shrink-0">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchTerm" (input)="onSearchInput()"
+          placeholder="Rechercher par bien…"
+          class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div class="flex gap-2">
+        <select [(ngModel)]="filterLu" (change)="loadConversations(0)"
+          class="flex-1 px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none">
+          <option value="">Toutes</option>
+          <option value="false">Non lues</option>
+          <option value="true">Lues</option>
+        </select>
+        <select [(ngModel)]="sortBy" (change)="loadConversations(0)"
+          class="flex-1 px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none">
+          <option value="lastMessageAt">Dernier msg</option>
+          <option value="createdAt">Date création</option>
+          <option value="id">ID</option>
+        </select>
+        <button (click)="toggleSortDir()" title="Inverser l'ordre"
+          class="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-gray-600 transition">
+          {{ sortDir === 'DESC' ? '↓' : '↑' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Conversation list -->
+    <div class="flex-1 overflow-y-auto">
+      @if (loadingConvs()) {
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <div class="flex gap-3 px-4 py-3 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse flex-shrink-0"></div>
+            <div class="flex-1 space-y-2 pt-1">
+              <div class="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              <div class="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
+            </div>
+          </div>
+        }
+      } @else if (aucuneConversation) {
+        <div class="flex flex-col items-center justify-center py-16 text-center px-4">
+          <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mb-3">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <p class="text-sm text-gray-500">Aucune conversation</p>
+          <p class="text-xs text-gray-400 mt-1">Les échanges avec vos locataires apparaîtront ici.</p>
+        </div>
+      } @else {
+        @for (conv of conversations(); track conv.id) {
+          <button (click)="openConversation(conv)"
+            class="w-full text-left flex gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
+            [class.bg-blue-50]="selectedConv()?.id === conv.id"
+            [class.border-l-2]="selectedConv()?.id === conv.id"
+            [class.border-l-blue-600]="selectedConv()?.id === conv.id">
+
+            <!-- Avatar with unread badge -->
+            <div class="relative flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold">
+                {{ initials(interlocutor(conv)) }}
+              </div>
+              @if (conv.nonLuCount > 0) {
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">
+                  {{ conv.nonLuCount > 9 ? '9+' : conv.nonLuCount }}
+                </span>
+              }
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate">{{ interlocutor(conv) }}</p>
+              @if (conv.bienTitre) {
+                <p class="text-xs text-blue-600 truncate mt-0.5">{{ conv.bienTitre }}</p>
+              }
+              <p class="text-xs text-gray-500 truncate mt-0.5">
+                {{ conv.lastMessage ?? 'Nouvelle conversation' }}
+              </p>
+            </div>
+
+            <!-- Time -->
+            <span class="text-[10px] text-gray-400 flex-shrink-0 pt-0.5">{{ fmtTime(conv.lastMessageAt) }}</span>
+          </button>
+        }
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
+        <button (click)="loadConversations(currentPage() - 1)" [disabled]="currentPage() === 0"
+          class="px-3 py-1 text-sm border border-gray-200 rounded-lg disabled:opacity-30 hover:bg-gray-50 transition">‹</button>
+        <span class="text-xs text-gray-500">Page {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+        <button (click)="loadConversations(currentPage() + 1)" [disabled]="currentPage() >= totalPages() - 1"
+          class="px-3 py-1 text-sm border border-gray-200 rounded-lg disabled:opacity-30 hover:bg-gray-50 transition">›</button>
+      </div>
+    }
+
+    <!-- WS status -->
+    <div class="px-4 py-2 border-t border-gray-100 flex items-center gap-2 flex-shrink-0">
+      <span class="w-2 h-2 rounded-full flex-shrink-0" [class]="wsStatusColor"></span>
+      <span class="text-[11px] text-gray-400">{{ wsStatusLabel }}</span>
+    </div>
+  </aside>
+
+  <!-- ══ CHAT AREA ══════════════════════════════════════════════════════════ -->
+  <main
+    class="flex-1 flex-col overflow-hidden bg-gray-50 md:flex"
+    [class.hidden]="showSidebar()"
+    [class.flex]="!showSidebar()">
+
+    @if (!selectedConv()) {
+      <!-- Empty state (desktop) -->
+      <div class="flex-1 flex flex-col items-center justify-center text-center px-8">
+        <div class="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-4">
+          <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+        </div>
+        <h2 class="text-lg font-semibold text-gray-700 mb-1">Vos messages</h2>
+        <p class="text-sm text-gray-400 max-w-xs">Sélectionnez une conversation dans la liste pour commencer à écrire.</p>
+      </div>
+    } @else {
+      <!-- Active conversation -->
+      <div class="flex flex-col h-full overflow-hidden">
+
+        <!-- Chat header -->
+        <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 flex-shrink-0">
+
+          <!-- Back button (mobile) -->
+          <button (click)="backToList()" class="md:hidden p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+
+          <!-- Avatar -->
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            {{ initials(interlocutor(selectedConv()!)) }}
+          </div>
+
+          <!-- Contact info -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">{{ interlocutor(selectedConv()!) }}</p>
+            @if (selectedConv()?.bienTitre) {
+              <p class="text-xs text-blue-600 truncate">{{ selectedConv()!.bienTitre }}</p>
+            }
+          </div>
+
+          <!-- Bien chip -->
+          <span class="hidden sm:inline-flex items-center px-2.5 py-1 bg-gray-100 text-xs text-gray-600 rounded-full font-medium">
+            Bien #{{ selectedConv()!.bienId }}
+          </span>
+        </div>
+
+        <!-- Messages -->
+        <div #messagesEl class="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+          @if (loadingMsgs()) {
+            <div class="flex items-center justify-center gap-2 py-8 text-gray-400 text-sm">
+              <span class="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></span>
+              Chargement…
+            </div>
+          } @else {
+            @for (msg of messages(); track $index) {
+              @if (msg.type === 'separator') {
+                <div class="flex items-center gap-3 py-2">
+                  <span class="flex-1 h-px bg-gray-200"></span>
+                  <span class="text-[11px] text-gray-400 uppercase tracking-wide font-medium whitespace-nowrap">{{ msg.label }}</span>
+                  <span class="flex-1 h-px bg-gray-200"></span>
+                </div>
+              } @else {
+                <div class="flex flex-col"
+                  [class.items-end]="msg.direction === 'outgoing'"
+                  [class.items-start]="msg.direction === 'incoming'">
+                  <div class="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words"
+                    [class.bg-blue-600]="msg.direction === 'outgoing'"
+                    [class.text-white]="msg.direction === 'outgoing'"
+                    [class.rounded-br-sm]="msg.direction === 'outgoing'"
+                    [class.bg-white]="msg.direction === 'incoming'"
+                    [class.text-gray-800]="msg.direction === 'incoming'"
+                    [class.border]="msg.direction === 'incoming'"
+                    [class.border-gray-200]="msg.direction === 'incoming'"
+                    [class.rounded-bl-sm]="msg.direction === 'incoming'"
+                    [class.shadow-sm]="msg.direction === 'incoming'"
+                    [class.ring-1]="msg.isNew && msg.direction === 'incoming'"
+                    [class.ring-blue-200]="msg.isNew && msg.direction === 'incoming'">
+                    {{ msg.contenu }}
+                  </div>
+                  <span class="text-[10px] text-gray-400 mt-1 px-1">{{ msg.time }}</span>
+                </div>
+              }
+            }
+          }
+        </div>
+
+        <!-- Input area -->
+        <div class="bg-white border-t border-gray-200 px-4 py-3 flex items-end gap-3 flex-shrink-0">
+          <div class="flex-1 bg-gray-100 rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 transition">
+            <textarea
+              [(ngModel)]="messageInput"
+              (keydown)="onKeyDown($event)"
+              rows="1"
+              placeholder="Écrivez un message… (Entrée pour envoyer)"
+              class="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-400 resize-none focus:outline-none max-h-28 leading-relaxed"
+              style="height: auto"
+              (input)="$any($event.target).style.height = 'auto'; $any($event.target).style.height = Math.min($any($event.target).scrollHeight, 112) + 'px'">
+            </textarea>
+          </div>
+          <button (click)="sendMessage()" [disabled]="!messageInput.trim()"
+            class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            title="Envoyer (Entrée)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    }
+  </main>
+
+</div>

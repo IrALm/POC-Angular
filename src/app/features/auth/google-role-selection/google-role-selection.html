@@ -1,0 +1,124 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-5 sm:p-8">
+  <div class="w-full max-w-lg">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2.5 justify-center">
+        <div class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center shadow">
+          <span class="text-white font-bold">K</span>
+        </div>
+        <span class="text-2xl font-bold text-gray-900">Kupanga</span>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Bienvenue !</h1>
+      <p class="mt-2 text-gray-500 text-sm">Pour continuer, choisissez votre profil sur Kupanga.</p>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="mb-5 flex items-start gap-3 p-3.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+        <span class="text-base shrink-0">⚠</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <!-- Role cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+
+      <!-- Propriétaire -->
+      <button type="button"
+              (click)="select('ROLE_PROPRIETAIRE')"
+              class="relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all focus:outline-none"
+              [class.border-blue-600]="selectedRole() === 'ROLE_PROPRIETAIRE'"
+              [class.bg-blue-50]="selectedRole() === 'ROLE_PROPRIETAIRE'"
+              [class.border-gray-200]="selectedRole() !== 'ROLE_PROPRIETAIRE'"
+              [class.bg-white]="selectedRole() !== 'ROLE_PROPRIETAIRE'"
+              [class.hover:border-blue-300]="selectedRole() !== 'ROLE_PROPRIETAIRE'">
+
+        @if (selectedRole() === 'ROLE_PROPRIETAIRE') {
+          <div class="absolute top-3 right-3 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        }
+
+        <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+          <svg class="w-7 h-7 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+
+        <div class="text-center">
+          <p class="font-bold text-gray-900 text-base">Propriétaire</p>
+          <p class="text-xs text-gray-500 mt-1">Je possède des biens et les gère</p>
+        </div>
+      </button>
+
+      <!-- Locataire -->
+      <button type="button"
+              (click)="select('ROLE_LOCATAIRE')"
+              class="relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all focus:outline-none"
+              [class.border-emerald-600]="selectedRole() === 'ROLE_LOCATAIRE'"
+              [class.bg-emerald-50]="selectedRole() === 'ROLE_LOCATAIRE'"
+              [class.border-gray-200]="selectedRole() !== 'ROLE_LOCATAIRE'"
+              [class.bg-white]="selectedRole() !== 'ROLE_LOCATAIRE'"
+              [class.hover:border-emerald-300]="selectedRole() !== 'ROLE_LOCATAIRE'">
+
+        @if (selectedRole() === 'ROLE_LOCATAIRE') {
+          <div class="absolute top-3 right-3 w-5 h-5 bg-emerald-600 rounded-full flex items-center justify-center">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        }
+
+        <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center">
+          <svg class="w-7 h-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+
+        <div class="text-center">
+          <p class="font-bold text-gray-900 text-base">Locataire</p>
+          <p class="text-xs text-gray-500 mt-1">Je loue un logement</p>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- Confirm button -->
+    <button type="button"
+            (click)="confirm()"
+            [disabled]="!selectedRole() || loading()"
+            class="w-full font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm text-white"
+            [class.bg-blue-700]="selectedRole() === 'ROLE_PROPRIETAIRE' && !loading()"
+            [class.hover:bg-blue-800]="selectedRole() === 'ROLE_PROPRIETAIRE' && !loading()"
+            [class.bg-emerald-600]="selectedRole() === 'ROLE_LOCATAIRE' && !loading()"
+            [class.hover:bg-emerald-700]="selectedRole() === 'ROLE_LOCATAIRE' && !loading()"
+            [class.bg-gray-300]="!selectedRole()"
+            [class.cursor-not-allowed]="!selectedRole() || loading()"
+            [class.bg-blue-400]="loading() && selectedRole() === 'ROLE_PROPRIETAIRE'"
+            [class.bg-emerald-400]="loading() && selectedRole() === 'ROLE_LOCATAIRE'">
+      @if (loading()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        Enregistrement…
+      } @else {
+        Confirmer mon profil
+      }
+    </button>
+
+    <p class="text-center mt-5 text-xs text-gray-400">
+      <a routerLink="/login" class="hover:text-gray-600 transition-colors">← Retour à la connexion</a>
+    </p>
+
+  </div>
+</div>

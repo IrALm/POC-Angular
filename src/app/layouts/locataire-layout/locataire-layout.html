@@ -1,0 +1,303 @@
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+
+  <!-- Mobile overlay -->
+  @if (sidebarOpen()) {
+    <div class="fixed inset-0 bg-black/40 z-20 lg:hidden" (click)="closeSidebar()"></div>
+  }
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-30 flex flex-col
+                 transition-transform duration-200 ease-in-out
+                 lg:translate-x-0"
+         [class.-translate-x-full]="!sidebarOpen()"
+         [class.translate-x-0]="sidebarOpen()">
+
+    <!-- Logo -->
+    <div class="h-16 flex items-center px-5 border-b border-gray-100 shrink-0">
+      <a routerLink="/" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+          <span class="text-white font-bold text-sm">K</span>
+        </div>
+        <span class="text-lg font-bold text-gray-900">Kupanga</span>
+      </a>
+    </div>
+
+    <!-- Role badge + notification bells -->
+    <div class="px-5 py-3 border-b border-gray-100 relative">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
+          Espace Locataire
+        </span>
+
+        <div class="flex items-center gap-1">
+
+          <!-- App notifications bell -->
+          <button (click)="toggleAppNotifDropdown()"
+                  class="relative p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            @if (notifService.unreadCount() > 0) {
+              <span class="absolute -top-0.5 -right-0.5 bg-orange-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow">
+                {{ notifService.unreadCount() > 99 ? '99+' : notifService.unreadCount() }}
+              </span>
+            }
+          </button>
+
+          <!-- Chat messages bell -->
+          <button (click)="toggleNotifDropdown()"
+                  class="relative p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            @if (chatService.unreadCount() > 0) {
+              <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow">
+                {{ chatService.unreadCount() > 99 ? '99+' : chatService.unreadCount() }}
+              </span>
+            }
+          </button>
+
+        </div>
+      </div>
+
+      <!-- App notifications dropdown (desktop) -->
+      @if (showAppNotifDropdown()) {
+        <div class="fixed inset-0 z-40 hidden lg:block" (click)="showAppNotifDropdown.set(false)"></div>
+        <div class="absolute left-0 right-0 top-full z-50 hidden lg:block bg-white border border-gray-200 shadow-xl rounded-b-lg max-h-80 overflow-y-auto">
+          <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+            <span class="text-xs font-semibold text-gray-600">Notifications</span>
+            @if (notifService.unreadCount() > 0) {
+              <button (click)="markAllAppNotifsRead()"
+                      class="text-[10px] text-emerald-600 hover:underline">
+                Tout marquer lu
+              </button>
+            }
+          </div>
+          @if (notifService.notifications().length === 0) {
+            <p class="px-4 py-6 text-center text-sm text-gray-400">Aucune notification</p>
+          } @else {
+            @for (notif of notifService.notifications(); track notif.id) {
+              <button (click)="handleNotifClick(notif)"
+                      [class.bg-orange-50]="!notif.lue"
+                      class="w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 text-left transition-colors">
+                <span class="text-base shrink-0 mt-0.5">{{ notifIcon(notif.type) }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs truncate" [class.font-semibold]="!notif.lue" [class.text-gray-800]="!notif.lue" [class.text-gray-600]="notif.lue">
+                    {{ notif.titre }}
+                  </p>
+                  <p class="text-xs text-gray-500 truncate">{{ notif.message }}</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">{{ formatNotifDate(notif.createdAt) }}</p>
+                </div>
+                @if (!notif.lue) {
+                  <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1.5"></span>
+                }
+              </button>
+            }
+          }
+        </div>
+      }
+
+      <!-- Chat messages dropdown (desktop) -->
+      @if (showNotifDropdown()) {
+        <div class="fixed inset-0 z-40 hidden lg:block" (click)="showNotifDropdown.set(false)"></div>
+        <div class="absolute left-0 right-0 top-full z-50 hidden lg:block bg-white border border-gray-200 shadow-xl rounded-b-lg max-h-72 overflow-y-auto">
+          <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-600">Messages non lus</span>
+            @if (chatService.unreadConvos().length > 0) {
+              <span class="text-[10px] text-gray-400">{{ chatService.unreadConvos().length }} conv.</span>
+            }
+          </div>
+          @if (chatService.unreadConvos().length === 0) {
+            <p class="px-4 py-6 text-center text-sm text-gray-400">Aucun message non lu</p>
+          } @else {
+            @for (conv of chatService.unreadConvos(); track conv.id) {
+              <a [routerLink]="'/locataire/chat'" (click)="showNotifDropdown.set(false); closeSidebar()"
+                 class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <span class="text-emerald-700 font-bold text-[11px]">{{ conv.emailExpediteur.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-gray-800 truncate">{{ conv.emailExpediteur }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ conv.lastMessage }}</p>
+                </div>
+                @if (conv.nonLuCount > 0) {
+                  <span class="bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shrink-0">
+                    {{ conv.nonLuCount }}
+                  </span>
+                }
+              </a>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="bg-emerald-50 text-emerald-700 font-semibold"
+           (click)="closeSidebar()"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+          <span class="text-base w-5 text-center">{{ item.icon }}</span>
+          <span class="flex-1">{{ item.label }}</span>
+          @if (item.path.includes('chat') && chatService.unreadCount() > 0) {
+            <span class="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow-sm">
+              {{ chatService.unreadCount() > 99 ? '99+' : chatService.unreadCount() }}
+            </span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- User info -->
+    <div class="p-4 border-t border-gray-100 shrink-0">
+      <div class="flex items-center gap-3 mb-3">
+        @if (auth.currentUser()?.urlProfile) {
+          <img [src]="auth.currentUser()!.urlProfile!" alt="avatar"
+               class="w-9 h-9 rounded-full object-cover border-2 border-emerald-100 shrink-0">
+        } @else {
+          <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+            <span class="text-emerald-700 font-bold text-sm">{{ userInitials }}</span>
+          </div>
+        }
+        <div class="overflow-hidden">
+          <p class="text-sm font-semibold text-gray-900 truncate">
+            {{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}
+          </p>
+          <p class="text-xs text-gray-400 truncate">{{ auth.currentUser()?.mail }}</p>
+        </div>
+      </div>
+      <button (click)="logout()"
+              class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors">
+        <span>⎋</span> Déconnexion
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ─── Main area ─── -->
+  <div class="flex-1 flex flex-col lg:ml-64 min-w-0">
+
+    <!-- Mobile top bar -->
+    <div class="lg:hidden flex items-center gap-3 h-14 px-4 bg-white border-b border-gray-200 shrink-0 relative">
+      <button (click)="toggleSidebar()"
+              class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <div class="w-6 h-6 bg-emerald-600 rounded flex items-center justify-center">
+        <span class="text-white font-bold text-xs">K</span>
+      </div>
+      <span class="font-semibold text-gray-800 text-sm flex-1">Espace Locataire</span>
+
+      <!-- App notifications bell (mobile) -->
+      <button (click)="toggleAppNotifDropdown()"
+              class="relative p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        @if (notifService.unreadCount() > 0) {
+          <span class="absolute -top-0.5 -right-0.5 bg-orange-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow">
+            {{ notifService.unreadCount() > 99 ? '99+' : notifService.unreadCount() }}
+          </span>
+        }
+      </button>
+
+      <!-- Chat messages bell (mobile) -->
+      <button (click)="toggleNotifDropdown()"
+              class="relative p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        @if (chatService.unreadCount() > 0) {
+          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow">
+            {{ chatService.unreadCount() > 99 ? '99+' : chatService.unreadCount() }}
+          </span>
+        }
+      </button>
+
+      <!-- App notifications dropdown (mobile) -->
+      @if (showAppNotifDropdown()) {
+        <div class="fixed inset-0 z-40" (click)="showAppNotifDropdown.set(false)"></div>
+        <div class="absolute left-0 right-0 top-full z-50 bg-white border-b border-gray-200 shadow-xl max-h-80 overflow-y-auto">
+          <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+            <span class="text-xs font-semibold text-gray-600">Notifications</span>
+            @if (notifService.unreadCount() > 0) {
+              <button (click)="markAllAppNotifsRead()"
+                      class="text-[10px] text-emerald-600 hover:underline">
+                Tout marquer lu
+              </button>
+            }
+          </div>
+          @if (notifService.notifications().length === 0) {
+            <p class="px-4 py-6 text-center text-sm text-gray-400">Aucune notification</p>
+          } @else {
+            @for (notif of notifService.notifications(); track notif.id) {
+              <button (click)="handleNotifClick(notif)"
+                      [class.bg-orange-50]="!notif.lue"
+                      class="w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 text-left transition-colors">
+                <span class="text-base shrink-0 mt-0.5">{{ notifIcon(notif.type) }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs truncate" [class.font-semibold]="!notif.lue" [class.text-gray-800]="!notif.lue" [class.text-gray-600]="notif.lue">
+                    {{ notif.titre }}
+                  </p>
+                  <p class="text-xs text-gray-500 truncate">{{ notif.message }}</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">{{ formatNotifDate(notif.createdAt) }}</p>
+                </div>
+                @if (!notif.lue) {
+                  <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1.5"></span>
+                }
+              </button>
+            }
+          }
+        </div>
+      }
+
+      <!-- Chat messages dropdown (mobile) -->
+      @if (showNotifDropdown()) {
+        <div class="fixed inset-0 z-40" (click)="showNotifDropdown.set(false)"></div>
+        <div class="absolute left-0 right-0 top-full z-50 bg-white border-b border-gray-200 shadow-xl max-h-72 overflow-y-auto">
+          <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-600">Messages non lus</span>
+            @if (chatService.unreadConvos().length > 0) {
+              <span class="text-[10px] text-gray-400">{{ chatService.unreadConvos().length }} conv.</span>
+            }
+          </div>
+          @if (chatService.unreadConvos().length === 0) {
+            <p class="px-4 py-6 text-center text-sm text-gray-400">Aucun message non lu</p>
+          } @else {
+            @for (conv of chatService.unreadConvos(); track conv.id) {
+              <a [routerLink]="'/locataire/chat'" (click)="showNotifDropdown.set(false)"
+                 class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <span class="text-emerald-700 font-bold text-[11px]">{{ conv.emailExpediteur.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-gray-800 truncate">{{ conv.emailExpediteur }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ conv.lastMessage }}</p>
+                </div>
+                @if (conv.nonLuCount > 0) {
+                  <span class="bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shrink-0">
+                    {{ conv.nonLuCount }}
+                  </span>
+                }
+              </a>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Page content -->
+    <main class="flex-1 overflow-auto p-4 sm:p-6">
+      <router-outlet />
+    </main>
+
+  </div>
+
+</div>

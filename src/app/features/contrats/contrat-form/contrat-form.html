@@ -1,0 +1,168 @@
+<div class="p-6 max-w-3xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <a routerLink="/proprietaire/contrats" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-4 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Retour aux contrats
+    </a>
+    <h1 class="text-2xl font-bold text-gray-900">Nouveau contrat de location</h1>
+    <p class="text-sm text-gray-500 mt-1">Le PDF est généré automatiquement. Vous pourrez le signer depuis la liste.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
+    <!-- Global error -->
+    @if (error()) {
+      <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-3">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Section 1 : Bien -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Bien concerné</h2>
+
+      @if (biensLoading()) {
+        <div class="h-11 bg-gray-100 rounded-xl animate-pulse"></div>
+      } @else if (biens().length === 0) {
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          Vous n'avez aucun bien publié.
+          <a routerLink="/proprietaire/biens/nouveau" class="underline font-medium ml-1">Créer un bien</a>
+        </div>
+      } @else {
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner un bien <span class="text-red-500">*</span></label>
+          <select formControlName="bienId" (change)="onBienChange($event)"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            [class.border-red-400]="fieldError('bienId')">
+            <option [ngValue]="null" disabled>— Choisir un bien —</option>
+            @for (bien of biens(); track bien.id) {
+              <option [value]="bien.id">
+                {{ bien.titre }} — {{ bien.ville }} ({{ formatPrice(bien.loyerMensuel) }} €/mois)
+              </option>
+            }
+          </select>
+          @if (fieldError('bienId'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+      }
+    </section>
+
+    <!-- Section 2 : Locataire -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Locataire</h2>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email du locataire <span class="text-red-500">*</span></label>
+        <input formControlName="emailLocataire" type="email" placeholder="locataire@email.com"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [class.border-red-400]="fieldError('emailLocataire')">
+        @if (fieldError('emailLocataire'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        <p class="text-xs text-gray-400 mt-1.5">
+          Le locataire recevra un email avec un lien de signature après votre propre signature.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3 : Dates du bail -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-4">Durée du bail</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Date de début <span class="text-red-500">*</span></label>
+          <input formControlName="dateDebut" type="date"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('dateDebut')">
+          @if (fieldError('dateDebut'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Durée (mois) <span class="text-red-500">*</span></label>
+          <input formControlName="dureeBailMois" type="number" min="1" max="120" placeholder="12"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-400]="fieldError('dureeBailMois')">
+          @if (fieldError('dureeBailMois'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+          <input formControlName="dateFin" type="date"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <p class="text-xs text-gray-400 mt-1">Optionnel (bail illimité si vide)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4 : Conditions financières -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900 mb-1">Conditions financières</h2>
+      <p class="text-xs text-gray-400 mb-4">Pré-rempli depuis le bien sélectionné, modifiable si besoin.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Loyer mensuel (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="loyerMensuel" type="number" min="1" placeholder="850"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('loyerMensuel')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('loyerMensuel'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Charges mensuelles (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="chargesMensuelles" type="number" min="0" placeholder="100"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('chargesMensuelles')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('chargesMensuelles'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt de garantie (€) <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input formControlName="depotGarantie" type="number" min="0" placeholder="1700"
+              class="w-full rounded-xl border border-gray-300 pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-400]="fieldError('depotGarantie')">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          </div>
+          @if (fieldError('depotGarantie'); as err) { <p class="text-xs text-red-500 mt-1">{{ err }}</p> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Info box -->
+    <div class="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-800">
+      <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <p class="font-medium">Processus de signature</p>
+        <p class="mt-0.5 text-blue-700">Après création, le contrat passe en statut <em>À signer (vous)</em>.
+        Retournez sur la liste pour signer, puis le locataire recevra un email avec son lien de signature.</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row gap-3 pb-8">
+      <button type="submit" [disabled]="loading() || biens().length === 0"
+        class="flex-1 sm:flex-none sm:min-w-[180px] py-3 px-6 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition flex items-center justify-center gap-2">
+        @if (loading()) {
+          <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          Création...
+        } @else {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Créer le contrat
+        }
+      </button>
+      <a routerLink="/proprietaire/contrats"
+        class="flex-1 sm:flex-none sm:min-w-[120px] py-3 px-6 bg-white text-gray-700 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition text-center">
+        Annuler
+      </a>
+    </div>
+  </form>
+</div>
